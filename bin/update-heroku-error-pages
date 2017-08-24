@@ -1,0 +1,6 @@
+#!/bin/sh
+
+cd "heroku"
+
+wget -O maintenance-mode.html https://www.herokucdn.com/error-pages/maintenance-mode.html
+wget -O application-error.html https://www.herokucdn.com/error-pages/application-error.html
