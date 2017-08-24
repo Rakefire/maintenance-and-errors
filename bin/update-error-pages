@@ -1,0 +1,16 @@
+#!/bin/sh
+
+APP_NAME=$1
+FOLDER=$2
+
+[[ -z $APP_NAME ]] && echo "Please provide a valid Heroku APP_NAME (e.g. strategery/-prod)" && exit 0
+[[ -z $FOLDER ]] && echo "Please provide a folder which exists here locally (e.g. strategery/)" && exit 0
+
+ROOT_DNS="maintenance.rakefire.io"
+
+heroku config:set \
+  ERROR_PAGE_URL="//$ROOT_DNS/$FOLDER/application-error.html" \
+  MAINTENANCE_PAGE_URL="//$ROOT_DNS/$FOLDER/maintenance-mode.html" \
+  --app $APP_NAME
+
+echo "Set Error and Maintenance Pages"
