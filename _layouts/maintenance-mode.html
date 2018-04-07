@@ -1,6 +1,38 @@
 ---
 layout: default
 title: Offline for Maintenance
+check_url: "/"
 ---
+
+<!--  Check for a 200 success -->
+<script type="text/javascript">
+  function check_url(url, opts) {
+    fetch(url)
+      .then(function(response) {
+        if (response.ok) {
+          console.log("Success")
+          location.reload();
+        }
+        throw new Error('failed!');
+      }).catch(function(error) {
+        if (opts.attempts < 1) { return }
+
+        if (opts.startingTimeout * 2 > opts.limit) {
+          var timeout = opts.limit;
+        } else {
+          var timeout = opts.startingTimeout * 2;
+        }
+
+        setTimeout(function(){
+          let new_opts = { "startingTimeout": timeout,
+                           "limit": opts.limit,
+                           "attempts": --opts.attempts }
+          check_url(url, new_opts);
+        }, timeout);
+      })
+  }
+
+  check_url("{{ page.check_url }}", { "startingTimeout": 1000, "limit": 15000, "attempts": 30 })
+</script>
 
 {{ content }}
