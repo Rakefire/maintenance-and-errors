@@ -6,6 +6,28 @@ check_url: "/"
 
 <!--  Check for a 200 success -->
 <script type="text/javascript">
+  function parsedQueryString() {
+    let query = window.location.search.substring(1);
+    let vars = query.split("&");
+    let query_string = {};
+
+    for (var i = 0; i < vars.length; i++) {
+      let pair = vars[i].split("=");
+      // If first entry with this name
+      if (typeof query_string[pair[0]] === "undefined") {
+        query_string[pair[0]] = decodeURIComponent(pair[1]);
+        // If second entry with this name
+      } else if (typeof query_string[pair[0]] === "string") {
+        let arr = [query_string[pair[0]], decodeURIComponent(pair[1])];
+        query_string[pair[0]] = arr;
+        // If third or later entry with this name
+      } else {
+        query_string[pair[0]].push(decodeURIComponent(pair[1]));
+      }
+    }
+    return query_string;
+  }
+
   function check_url(url, opts) {
     fetch(url)
       .then(function(response) {
@@ -32,7 +54,7 @@ check_url: "/"
       })
   }
 
-  check_url("{{ page.check_url }}", { "startingTimeout": 1000, "limit": 15000, "attempts": 30 })
+  check_url(parsedQueryString().check_url, { "startingTimeout": 1000, "limit": 15000, "attempts": 30 })
 </script>
 
 {{ content }}
