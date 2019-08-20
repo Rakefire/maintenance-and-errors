@@ -6,55 +6,52 @@ check_url: "/"
 
 <!--  Check for a 200 success -->
 <script type="text/javascript">
-  function parsedQueryString() {
-    let query = window.location.search.substring(1);
-    let vars = query.split("&");
-    let query_string = {};
-
-    for (var i = 0; i < vars.length; i++) {
-      let pair = vars[i].split("=");
-      // If first entry with this name
-      if (typeof query_string[pair[0]] === "undefined") {
-        query_string[pair[0]] = decodeURIComponent(pair[1]);
-        // If second entry with this name
-      } else if (typeof query_string[pair[0]] === "string") {
-        let arr = [query_string[pair[0]], decodeURIComponent(pair[1])];
-        query_string[pair[0]] = arr;
-        // If third or later entry with this name
-      } else {
-        query_string[pair[0]].push(decodeURIComponent(pair[1]));
-      }
-    }
-    return query_string;
+  window.checkConfig = {
+    "url": "{{ page.check_url }}",
+    "startingTimeout": 1000,
+    "limit": 15000,
+    "attempts": 30
   }
+</script>
 
-  function check_url(url, opts) {
+<script type="text/javascript">
+  function check_url(opts) {
+    const url = opts.url || "random-will-never-resolve"
+    console.log(`Checking... ${url}`)
+
     fetch(url)
       .then(function(response) {
         if (response.ok) {
           console.log("Success")
-          location.reload();
+          window.location.href = url
         }
+
         throw new Error('failed!');
-      }).catch(function(error) {
+      })
+      .catch(function(error) {
         if (opts.attempts < 1) { return }
 
+        let timeout = 0
         if (opts.startingTimeout * 2 > opts.limit) {
-          var timeout = opts.limit;
+          timeout = opts.limit
         } else {
-          var timeout = opts.startingTimeout * 2;
+          timeout = opts.startingTimeout * 2
         }
 
-        setTimeout(function(){
-          let new_opts = { "startingTimeout": timeout,
-                           "limit": opts.limit,
-                           "attempts": --opts.attempts }
-          check_url(url, new_opts);
-        }, timeout);
+        console.log(`Waiting for ${timeout / 1000} seconds`)
+
+        setTimeout(function() {
+          const new_opts = { "url": url,
+                             "startingTimeout": timeout,
+                             "limit": opts.limit,
+                             "attempts": --opts.attempts }
+          check_url(new_opts);
+        }, timeout)
       })
   }
 
-  check_url(parsedQueryString().check_url, { "startingTimeout": 1000, "limit": 15000, "attempts": 30 })
+  console.log("Starting...")
+  setTimeout(function() { check_url(window.checkConfig) }, 3000)
 </script>
 
 {{ content }}
