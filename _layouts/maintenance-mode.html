@@ -23,7 +23,7 @@ check_url: "/"
       .then(function(response) {
         if (response.ok) {
           console.log("Success")
-          window.location.href = url
+          window.location = url
         }
 
         throw new Error('failed!');
