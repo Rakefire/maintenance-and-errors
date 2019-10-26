@@ -20,7 +20,7 @@ check_url: "/"
     console.log(`Checking... ${url}`)
 
     fetch(url)
-      .then(function(response) {
+      .then(function (response) {
         if (response.ok) {
           console.log("Success")
           window.location = url
@@ -28,7 +28,7 @@ check_url: "/"
 
         throw new Error('failed!');
       })
-      .catch(function(error) {
+      .catch(function (error) {
         if (opts.attempts < 1) { return }
 
         let timeout = 0
@@ -40,18 +40,20 @@ check_url: "/"
 
         console.log(`Waiting for ${timeout / 1000} seconds`)
 
-        setTimeout(function() {
-          const new_opts = { "url": url,
-                             "startingTimeout": timeout,
-                             "limit": opts.limit,
-                             "attempts": --opts.attempts }
+        setTimeout(function () {
+          const new_opts = {
+            "url": url,
+            "startingTimeout": timeout,
+            "limit": opts.limit,
+            "attempts": --opts.attempts
+          }
           check_url(new_opts);
         }, timeout)
       })
   }
 
   console.log("Starting...")
-  setTimeout(function() { check_url(window.checkConfig) }, 3000)
+  setTimeout(function () { check_url(window.checkConfig) }, 3000)
 </script>
 
 {{ content }}
